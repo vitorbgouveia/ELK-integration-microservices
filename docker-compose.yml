@@ -1,0 +1,68 @@
+version: '2.2'
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    restart: always
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=127.0.0.1:9300
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.8.0
+    restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    volumes:
+      - kibana:/usr/share/kibana
+    ports:
+      - 5601:5601
+    networks:
+      - elastic
+
+  apm-server:
+    container_name: apm-server
+    build: ./apm-server
+    restart: always
+    depends_on:
+      - elasticsearch
+      - kibana
+    cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    cap_drop: ["ALL"]
+    ports:
+      - 8200:8200
+    networks:
+      - elastic
+
+  heartbeat:
+    container_name: heartbeat
+    build: ./heartbeat
+    restart: always
+    depends_on:
+      - elasticsearch
+      - kibana
+    networks:
+      - elastic
+
+volumes:
+  elasticsearch:
+    driver: local
+  kibana:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge

@@ -1,0 +1,21 @@
+heartbeat.monitors:
+
+  - type: http
+    name: exemplo
+    check.response.status: [200]
+    schedule: '@every 60s'
+    hosts: ["http://host.com:10000/services/exemplo"]
+    tags: ["Core", "Production"]
+
+
+processors:
+  - add_cloud_metadata: ~
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: elastic
+  password: ElastiCPassword
+
+setup.kibana:
+  host: "kibana:5601"
+

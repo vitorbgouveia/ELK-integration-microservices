@@ -1,0 +1,15 @@
+apm-server:
+  host: "apm-server:8200"
+  rum:
+  enabled: true
+  kibana:
+    enabled: true
+    host: "kibana:5601"
+    username: "elastic"
+    password: "ElastiCPassword"
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: "elastic"
+  password: "ElastiCPassword"
+
